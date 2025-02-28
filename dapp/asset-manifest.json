@@ -1,0 +1,25 @@
+{
+  "files": {
+    "main.css": "/dapp/static/css/main.587c032b.chunk.css",
+    "main.js": "/dapp/static/js/main.35da2356.chunk.js",
+    "main.js.map": "/dapp/static/js/main.35da2356.chunk.js.map",
+    "runtime-main.js": "/dapp/static/js/runtime-main.0ff97228.js",
+    "runtime-main.js.map": "/dapp/static/js/runtime-main.0ff97228.js.map",
+    "static/css/2.4659568d.chunk.css": "/dapp/static/css/2.4659568d.chunk.css",
+    "static/js/2.04fd2e0e.chunk.js": "/dapp/static/js/2.04fd2e0e.chunk.js",
+    "static/js/2.04fd2e0e.chunk.js.map": "/dapp/static/js/2.04fd2e0e.chunk.js.map",
+    "index.html": "/dapp/index.html",
+    "static/css/2.4659568d.chunk.css.map": "/dapp/static/css/2.4659568d.chunk.css.map",
+    "static/css/main.587c032b.chunk.css.map": "/dapp/static/css/main.587c032b.chunk.css.map",
+    "static/js/2.04fd2e0e.chunk.js.LICENSE.txt": "/dapp/static/js/2.04fd2e0e.chunk.js.LICENSE.txt",
+    "static/js/main.35da2356.chunk.js.LICENSE.txt": "/dapp/static/js/main.35da2356.chunk.js.LICENSE.txt",
+    "static/media/LogoSoferim.e9c55ba3.png": "/dapp/static/media/LogoSoferim.e9c55ba3.png"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.0ff97228.js",
+    "static/css/2.4659568d.chunk.css",
+    "static/js/2.04fd2e0e.chunk.js",
+    "static/css/main.587c032b.chunk.css",
+    "static/js/main.35da2356.chunk.js"
+  ]
+}
