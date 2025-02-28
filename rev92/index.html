@@ -1,0 +1,213 @@
+<!DOCTYPE HTML>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+ <link  rel="icon"   href="../favicon.png" type="image/png" />
+<title>Edición N° 92 (ebook) | Revista El Informativo foresto ganadero de la provincia de Misiones - Germán Oscar Zehentner</title>
+    <meta content="Germán Oscar Zehentner - Dr. En Cs. Veterinarias" name="description">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"><!--fa fa-icons-->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js" type="text/javascript"></script>
+        <link rel="stylesheet" href="css/layout.css" type="text/css" media="screen" charset="utf-8" />
+		<link rel="stylesheet" href="css/jd.banner.css" type="text/css" media="screen" charset="utf-8" />
+		<link rel="stylesheet" href="css/ReMooz.css" type="text/css" media="screen" charset="utf-8" />
+		<script src="scripts/mootools-1.2.1-core-yc.js" type="text/javascript"></script>
+		<script src="scripts/mootools-1.2-more.js" type="text/javascript"></script>
+		<script src="scripts/ReMooz.js" type="text/javascript"></script>
+		<script src="scripts/jd.gallery.js" type="text/javascript"></script>
+		<script src="scripts/jd.gallery.set.js" type="text/javascript"></script>
+		<script src="scripts/jd.gallery.transitions.js" type="text/javascript"></script>
+        <style>
+            
+            #pre-load-web {width:100%;position:absolute;background:#fff;left:0px;top:0px;z-index:100000}
+            /*aqui centramos la imagen si coloco margin left -30 es por que la imagen mide 60 */
+            #pre-load-web #imagen-load{left:50%;margin-left:-30px;position:absolute}
+            
+        </style>        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"></script>
+        <script>
+        $(document).ready(function(){
+        //eliminamos el scroll de la pagina
+        $("body").css({"overflow-y":"hidden"});
+        //guardamos en una variable el alto del que tiene tu browser que no es lo mismo que del DOM
+        var alto=$(window).height();
+        //agregamos en el body un div que sera que ocupe toda la pantalla y se muestra encima de todo
+        $("body").append("<div id='pre-load-web'>Cargando...</div>");
+        //le damos el alto
+        $("#pre-load-web").css({height:alto+"px"});
+        //esta sera la capa que esta dento de la capa que muestra un gif
+        $("#imagen-load").css({"margin-top":(alto/2)-30+"px"});
+        }) 
+
+        $(window).load(function(){
+           $("#pre-load-web").fadeOut(1000,function()
+           { 
+               //eliminamos la capa de precarga
+               $(this).remove();
+               //permitimos scroll
+               $("body").css({"overflow-y":"auto"}); 
+
+           });        
+        }) 
+            
+        </script>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+crossorigin="anonymous"></script>
+
+<!-- Bootstrap files (jQuery first, then Popper.js, then Bootstrap JS) -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js" type="text/javascript"></script>
+<!-- Menu jQuery -->
+<script type="text/javascript">
+    $(document).ready(function(){
+	var altura = $('.navbar').offset().top;
+	
+	$(window).on('scroll', function(){
+		if ( $(window).scrollTop() > altura ){
+			$('.navbar').addClass('menu-fixed');
+		} else {
+			$('.navbar').removeClass('menu-fixed');
+		}
+	});
+
+});
+</script>
+
+<script type="text/javascript">
+/// some script
+
+// jquery ready start
+$(document).ready(function() {
+	// jQuery code
+
+	//////////////////////// Prevent closing from click inside dropdown
+    $(document).on('click', '.dropdown-menu', function (e) {
+      e.stopPropagation();
+    });
+
+    // make it as accordion for smaller screens
+    if ($(window).width() < 992) {
+	  	$('.dropdown-menu a').click(function(e){
+	  		e.preventDefault();
+	        if($(this).next('.submenu').length){
+	        	$(this).next('.submenu').toggle();
+	        }
+	        $('.dropdown').on('hide.bs.dropdown', function () {
+			   $(this).find('.submenu').hide();
+			})
+	  	});
+	}
+	
+}); // jquery end
+</script>
+</head>
+<body class="body">
+<style>
+.body {
+  background-color: yellow;
+}
+
+.container-banner {
+  background-color: yellow;
+  display: flex;
+  flex-flow: row;
+}
+.container {
+  width: 1100px;
+  background-color: white;
+}
+.container-fluid {
+  display: flex;
+  flex-flow: row;
+}
+
+.item {
+  flex: 1 1 auto;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+  padding: 2px;
+  margin: 2px;
+}
+
+@media (max-width: 750px) {
+  .container-fluid {
+    /* si es muy angosta, uno debajo del otro */
+    flex-flow: column;
+  }
+}
+.blanco {
+  background-color: #B2FFFF;
+  width: 0%;
+}
+.white {
+  background-color: ;
+    background-image: url("");
+  width: 100%;
+}
+@media screen and (max-width: 720px) {
+        .blanco, .white { 
+                  width: 100%; 
+                   }
+                }
+a {
+   text-decoration:none 
+}
+</style>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<style type="text/css">
+.navbar {
+	position:fixed;
+	z-index:1000;
+	top:0;
+	/*max-width:1000px;*/
+	left:0;
+	width:100%;
+	box-shadow:0px 4px 3px rgba(0,0,0,.5);
+}
+</style>
+
+<div class="container">
+<div class="container-fluid">
+    <div class="item white">
+<br>
+<center>
+<h3>Revista El Informativo Foresto - Ganadero de Misiones</h3>
+<h4>Revista N° 92 (Sep - Oct 2015) <i>Ebook</i></h4>
+<br>
+<p><a href="Rev92.pdf" Target="_blank" rel="nofollow" class="btn btn-success">Descargar PDF</a></p>
+<iframe width="100%" height="400" src="http://online.fliphtml5.com/vqfz/uxup/#p=1" frameborder="0" allowfullscreen allowtransparency></iframe>
+</center>
+<br>
+<h5>Año 11 - N°92 * SET - OCT 2015<h5>
+<br>
+<h5>TITULOS:<br>
+> Leucaena, la alfalfa tropical<br>
+> Eucalyptus Grandis mejorado<br>
+> Selva Misionera<br>
+> Alerta en el NEA<br>
+> Animales Transgénicos</h5>
+<br>
+<h4>
+Germán Oscar Zehentner<br>
+Dr. En Cs. Veterinarias
+</h4>
+<center>
+<p><!--<a href="../91" rel="nofollow" class="btn btn-primary">← Revista N° 91</a>-->
+<a href="../" rel="nofollow" class="btn btn-secondary">Volver</a></p>
+</center>
+<br><br>
+    </div>
+
+</div>
+</div>
+<!---End--->
+<div>
+    <center>
+Powered by <a style="color:#000000"; href="../"><i>MEBYA</i></a> 2015
+    </center>
+</div>
+</body>
+</html>
