@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#0d3b66">
+  <link rel="apple-touch-icon" href="./icon-192.png">
   <title>Santo Rosario</title>
     <link href="favicon.png" rel="icon">
   <style>
@@ -678,6 +681,14 @@ Amén.</p>
       }
     }
   </script>
-
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then((reg) => console.log('Service Worker registrado con éxito:', reg.scope))
+        .catch((err) => console.log('Error al registrar Service Worker:', err));
+    });
+  }
+</script>
 </body>
 </html>
