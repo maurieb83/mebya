@@ -2,12 +2,11 @@ const CACHE_NAME = 'rosario-v1';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './styles.css',         // Cambia por tus archivos CSS si los tienes por separado
-  './app.js',             // Cambia por tus scripts JS si los tienes por separado
   './manifest.json',
+  './favicon.png',
+  './VIRGEN-MARIA-AUX.png',
   './icon-192.png',
   './icon-512.png'
-  // Agrega aquí las rutas relativas de tus imágenes o audios
 ];
 
 // Instalación e inicio del guardado en caché
@@ -36,7 +35,7 @@ self.addEventListener('activate', (e) => {
   self.clients.claim();
 });
 
-// Intercepción de solicitudes para responder desde la caché si está offline
+// Intercepción de solicitudes para responder offline
 self.addEventListener('fetch', (e) => {
   e.respondWith(
     caches.match(e.request).then((cachedResponse) => {
