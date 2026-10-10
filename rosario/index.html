@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#0d3b66">
   <link rel="apple-touch-icon" href="./icon-192.png">
   <title>Santo Rosario</title>
-    <link href="favicon.png" rel="icon">
+  <link href="favicon.png" rel="icon">
   <style>
     :root {
       /* MODO CLARO (POR DEFECTO) */
@@ -21,6 +21,8 @@
       --text-muted: blue;
       --border-color: #e2e8f0;
       --title-color: #1d4ed8;
+      --modal-bg: #f5f2e9;
+      --modal-border: #facc15;
     }
 
     [data-theme="dark"] {
@@ -35,6 +37,8 @@
       --text-muted: #94a3b8;
       --border-color: #334155;
       --title-color: #60a5fa;
+      --modal-bg: #1e293b;
+      --modal-border: #eab308;
     }
 
     * {
@@ -52,6 +56,7 @@
       max-width: 800px;
       margin: 0 auto;
       transition: background-color 0.3s ease, color 0.3s ease;
+      position: relative;
     }
 
     .top-bar {
@@ -180,6 +185,107 @@
       margin: 2.5rem 0;
     }
 
+    /* BOTÓN FLOTANTE DE ORACIÓN */
+    .pray-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #5b21b6;
+      color: white;
+      border: none;
+      font-size: 1.8rem;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .pray-button:hover {
+      transform: scale(1.08);
+      background: #4c1d95;
+    }
+
+    /* MODAL DE ORACIONES PREDILECTAS */
+    .pray-modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+    }
+
+    .pray-modal-overlay.active {
+      display: flex;
+    }
+
+    .pray-modal-content {
+      background-color: var(--modal-bg);
+      border: 4px solid var(--modal-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      width: 100%;
+      max-width: 500px;
+      max-height: 85vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    }
+
+    .close-modal-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #dc2626;
+      color: white;
+      border: 2px solid #7f1d1d;
+      width: 32px;
+      height: 32px;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s ease;
+    }
+
+    .close-modal-btn:hover {
+      background: #b91c1c;
+    }
+
+    .pray-modal-body h4 {
+      color: var(--text-main);
+      font-size: 1rem;
+      font-weight: 700;
+      margin-top: 1.2rem;
+      margin-bottom: 0.3rem;
+      text-transform: uppercase;
+    }
+
+    .pray-modal-body h4:first-child {
+      margin-top: 0;
+    }
+
+    .pray-modal-body p {
+      color: var(--text-main);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin-bottom: 1rem;
+    }
+
     @media (max-width: 600px) {
       body {
         padding: 0.8rem;
@@ -192,6 +298,13 @@
       }
       details {
         padding: 0.75rem 0.9rem;
+      }
+      .pray-button {
+        width: 52px;
+        height: 52px;
+        font-size: 1.5rem;
+        bottom: 15px;
+        right: 15px;
       }
     }
   </style>
@@ -208,9 +321,12 @@
     <h1>SANTO ROSARIO</h1>
     <h2 class="subtitle">En homenaje a los Hombres Valientes<br>Iglesia San Miguel 🇦🇷🇵🇾🇧🇷</h2>
   </header>
-<center>
-<img src="VIRGEN-MARIA-AUX.png" width="333" height="200">
-<br>VIRGEN MARIA AUXILIADORA</center>
+
+  <center>
+    <img src="VIRGEN-MARIA-AUX.png" width="333" height="200" alt="Virgen María Auxiliadora">
+    <br>VIRGEN MARIA AUXILIADORA
+  </center>
+
   <details>
     <summary>INICIO<br><b>¿Cómo rezar?</b></summary>
     <p>– Por la señal y nos persignamos.
@@ -663,6 +779,39 @@ para la perdición de las almas.
 Amén.</p>
   </details>
 
+  <!-- BOTÓN FLOTANTE PRAY -->
+  <button class="pray-button" id="prayBtn" onclick="openPrayModal()" title="Oraciones principales">
+    🙏🏻
+  </button>
+
+  <!-- MODAL DE ORACIONES -->
+  <div class="pray-modal-overlay" id="prayModal" onclick="closePrayModalOnOverlay(event)">
+    <div class="pray-modal-content">
+      <button class="close-modal-btn" onclick="closePrayModal()" title="Cerrar">✖</button>
+      <div class="pray-modal-body">
+        <h4>PADRE NUESTRO</h4>
+        <p>Padre nuestro, que estás en el cielo,<br>
+        santificado sea tu Nombre;<br>
+        venga a nosotros tu Reino;<br>
+        hágase tu voluntad en la tierra como en el cielo.<br>
+        Danos hoy nuestro pan de cada día;<br>
+        perdona nuestras ofensas,<br>
+        como también nosotros perdonamos a los que nos ofenden;<br>
+        no nos dejes caer en la tentación,<br>
+        y líbranos del mal.<br>
+        Amén.</p>
+
+        <h4>AVE MARÍA</h4>
+        <p>«Dios te salve, María, llena eres de gracia; el Señor es contigo. Bendita Tú eres entre todas las mujeres, y bendito es el fruto de tu vientre, Jesús.<br><br>
+        Santa María, Madre de Dios, ruega por nosotros, pecadores, ahora y en la hora de nuestra muerte. Amén».</p>
+
+        <h4>GLORIA</h4>
+        <p>Gloria al Padre, y al Hijo, y al Espíritu Santo.<br><br>
+        Como era en el principio, ahora y siempre, y por los siglos de los siglos. Amén.</p>
+      </div>
+    </div>
+  </div>
+
   <script>
     function toggleTheme() {
       const body = document.documentElement;
@@ -680,15 +829,30 @@ Amén.</p>
         text.textContent = 'Modo Claro';
       }
     }
+
+    function openPrayModal() {
+      document.getElementById('prayModal').classList.add('active');
+    }
+
+    function closePrayModal() {
+      document.getElementById('prayModal').classList.remove('active');
+    }
+
+    function closePrayModalOnOverlay(event) {
+      if (event.target.id === 'prayModal') {
+        closePrayModal();
+      }
+    }
   </script>
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then((reg) => console.log('Service Worker registrado con éxito:', reg.scope))
-        .catch((err) => console.log('Error al registrar Service Worker:', err));
-    });
-  }
-</script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then((reg) => console.log('Service Worker registrado con éxito:', reg.scope))
+          .catch((err) => console.log('Error al registrar Service Worker:', err));
+      });
+    }
+  </script>
 </body>
 </html>
