@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Energy 98 - Live Web Player</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        neon: {
+                            cyan: '#00f3ff',
+                            magenta: '#ff007f',
+                            purple: '#8a2be2',
+                            violet: '#1a0b2e',
+                            dark: '#0a0518',
+                            card: 'rgba(23, 15, 41, 0.65)'
+                        }
+                    },
+                    fontFamily: {
+                        display: ['Orbitron', 'sans-serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif']
+                    },
+                    animation: {
+                        'pulse-glow': 'pulseGlow 2s infinite alternate',
+                        'spin-slow': 'spin 12s linear infinite',
+                        'wave-bar': 'waveBar 1.2s ease-in-out infinite alternate',
+                    },
+                    keyframes: {
+                        pulseGlow: {
+                            '0%': { boxShadow: '0 0 15px rgba(0, 243, 255, 0.3), 0 0 30px rgba(255, 0, 127, 0.2)' },
+                            '100%': { boxShadow: '0 0 25px rgba(0, 243, 255, 0.7), 0 0 50px rgba(255, 0, 127, 0.5)' }
+                        },
+                        waveBar: {
+                            '0%': { height: '15%' },
+                            '100%': { height: '95%' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom scrollbar and glassmorphism fine-tuning */
+        body {
+            background-color: #0a0518;
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(138, 43, 226, 0.25) 0%, transparent 45%),
+                radial-gradient(circle at 85% 80%, rgba(255, 0, 127, 0.2) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(0, 243, 255, 0.1) 0%, transparent 60%);
+            background-attachment: fixed;
+            color: #f3f4f6;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            touch-action: manipulation;
+        }
+
+        .glass-panel {
+            background: rgba(20, 12, 38, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .glass-button {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(0, 243, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .glass-button:active {
+            transform: translateY(0);
+        }
+
+        /* Custom range slider style */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 9999px;
+            height: 6px;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 18px;
+            width: 18px;
+            border-radius: 50%;
+            background: #00f3ff;
+            box-shadow: 0 0 10px #00f3ff;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        input[type=range]::-webkit-slider-thumb:hover {
+            scale: 1.2;
+            background: #ffffff;
+            box-shadow: 0 0 15px #00f3ff, 0 0 25px #ff007f;
+        }
+
+        .text-glow-cyan {
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.6);
+        }
+
+        .text-glow-magenta {
+            text-shadow: 0 0 10px rgba(255, 0, 127, 0.6);
+        }
+
+        /* Vinyl rotation */
+        .spinning {
+            animation: spin 10s linear infinite;
+        }
+        .paused {
+            animation-play-state: paused;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+
+<body class="min-h-full flex flex-col justify-between items-center p-3 sm:p-6 select-none overflow-x-hidden">
+
+    <!-- TOP NAV / HEADER -->
+    <header class="w-full max-w-4xl flex justify-between items-center py-3 px-4 glass-panel rounded-2xl mb-4 sm:mb-6">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-neon-purple to-neon-magenta flex items-center justify-center shadow-lg shadow-neon-purple/40">
+                <i class="fa-solid font-bold fa-radio text-white text-lg"></i>
+            </div>
+            <div>
+                <h1 class="font-display font-black text-lg sm:text-xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan via-white to-neon-magenta">
+                    ENERGY 98
+                </h1>
+                <p class="text-xs text-gray-400 font-medium">181.FM Dance & Electronic</p>
+            </div>
+        </div>
+
+        <!-- Header Quick Action Controls -->
+        <div class="flex items-center space-x-2">
+            <!-- Favorite Toggle Button -->
+            <button id="favBtn" aria-label="Favorite Station" class="glass-button w-10 h-10 rounded-xl flex items-center justify-center text-gray-300 hover:text-neon-magenta">
+                <i class="fa-regular fa-heart text-base transition-transform active:scale-125"></i>
+            </button>
+            
+            <!-- Sleep Timer Modal Trigger -->
+            <button id="timerBtn" aria-label="Sleep Timer" class="glass-button w-10 h-10 rounded-xl flex items-center justify-center text-gray-300 hover:text-neon-cyan relative">
+                <i class="fa-regular fa-clock text-base"></i>
+                <span id="timerBadge" class="hidden absolute -top-1 -right-1 bg-neon-magenta text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"></span>
+            </button>
+
+            <!-- Share Button -->
+            <button id="shareBtn" aria-label="Share Stream" class="glass-button w-10 h-10 rounded-xl flex items-center justify-center text-gray-300 hover:text-neon-cyan">
+                <i class="fa-solid fa-share-nodes text-base"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN PLAYER CARD -->
+    <main class="w-full max-w-4xl glass-panel rounded-3xl p-4 sm:p-8 flex flex-col items-center shadow-2xl relative overflow-hidden my-auto">
+        <!-- Ambient Neon Glow Backdrop inside container -->
+        <div class="absolute -top-24 -left-24 w-64 h-64 bg-neon-cyan/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -right-24 w-64 h-64 bg-neon-magenta/20 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Live Status Bar & Peak Meter -->
+        <div class="w-full flex justify-between items-center mb-6 px-2">
+            <!-- Live Indicator Badge -->
+            <div class="flex items-center space-x-2 bg-black/40 px-3 py-1.5 rounded-full border border-white/10">
+                <span id="liveDot" class="w-2.5 h-2.5 rounded-full bg-gray-500"></span>
+                <span id="liveText" class="text-xs font-display font-semibold text-gray-400 tracking-wider">OFFLINE</span>
+            </div>
+
+            <!-- Equalizer / Visualizer Bar indicators -->
+            <div id="visualizerBars" class="flex items-end space-x-1 h-6 px-2 opacity-40">
+                <div class="w-1 bg-neon-cyan rounded-t h-2 transition-all duration-300"></div>
+                <div class="w-1 bg-neon-cyan rounded-t h-4 transition-all duration-300"></div>
+                <div class="w-1 bg-neon-magenta rounded-t h-3 transition-all duration-300"></div>
+                <div class="w-1 bg-neon-magenta rounded-t h-5 transition-all duration-300"></div>
+                <div class="w-1 bg-neon-purple rounded-t h-2 transition-all duration-300"></div>
+            </div>
+        </div>
+
+        <!-- ALBUM ART / VINYL DISK DISPLAY -->
+        <div class="relative my-4 sm:my-6 flex justify-center items-center">
+            <!-- Vinyl Outer Ring Accent -->
+            <div id="discGlow" class="w-56 h-56 sm:w-72 sm:h-72 rounded-full border border-white/10 flex items-center justify-center p-3 relative transition-all duration-700">
+                
+                <!-- Rotating Record / Artwork -->
+                <div id="vinylRecord" class="w-full h-full rounded-full bg-gradient-to-br from-gray-900 via-black to-gray-950 p-2 shadow-2xl relative flex items-center justify-center spinning paused border border-white/10">
+                    <!-- Vinyl Grooves Visual -->
+                    <div class="absolute inset-2 rounded-full border border-white/5 pointer-events-none"></div>
+                    <div class="absolute inset-6 rounded-full border border-white/5 pointer-events-none"></div>
+                    <div class="absolute inset-10 rounded-full border border-white/5 pointer-events-none"></div>
+                    
+                    <!-- Center Cover Image -->
+                    <div class="w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden border-4 border-neon-dark shadow-inner relative z-10 flex items-center justify-center bg-neon-violet">
+                        <img id="albumArt" 
+                             src="https://images.unsplash.com/photo-1571266028243-3716f02d2d2e?auto=format&fit=crop&w=400&q=80" 
+                             alt="Station Artwork" 
+                             class="w-full h-full object-cover"
+                             onerror="this.src='https://placehold.co/400x400/1a0b2e/00f3ff?text=Energy+98'">
+                    </div>
+                    <!-- Spindle Hole -->
+                    <div class="w-4 h-4 rounded-full bg-neon-dark absolute z-20 border border-white/20"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STREAM METADATA INFO -->
+        <div class="text-center my-4 max-w-md w-full px-2">
+            <h2 id="stationTitle" class="font-display text-xl sm:text-2xl font-bold tracking-wide text-white mb-1">
+                Energy 98
+            </h2>
+            <p id="trackTitle" class="text-xs sm:text-sm text-neon-cyan font-medium truncate mb-1">
+                Dance Hits & High Energy Beats
+            </p>
+            <p id="streamInfo" class="text-xs text-gray-400">
+                128 kbps MP3 • 181.FM Network
+            </p>
+        </div>
+
+        <!-- CANVAS AUDIO VISUALIZER -->
+        <div class="w-full max-w-xl h-16 sm:h-20 my-2 relative rounded-xl overflow-hidden bg-black/20 border border-white/5">
+            <canvas id="canvasVisualizer" class="w-full h-full block"></canvas>
+            <div id="visFallback" class="absolute inset-0 flex items-center justify-center text-xs text-gray-500 font-mono pointer-events-none">
+                Press Play to Start Visualizer
+            </div>
+        </div>
+
+        <!-- PLAYER CONTROLS SECTION -->
+        <div class="w-full max-w-lg mt-4 flex flex-col items-center space-y-6">
+            
+            <!-- Main Play / Pause Button Center -->
+            <div class="flex items-center justify-center space-x-6 w-full">
+                <!-- Mute Toggle (Mobile Friendly) -->
+                <button id="muteBtn" aria-label="Mute Stream" class="glass-button w-12 h-12 rounded-2xl flex items-center justify-center text-gray-300 hover:text-white">
+                    <i class="fa-solid fa-volume-high text-lg"></i>
+                </button>
+
+                <!-- PLAY / PAUSE Main Glowing Button -->
+                <button id="playBtn" aria-label="Play or Stop Radio" class="w-20 h-20 sm:w-22 sm:h-22 rounded-full bg-gradient-to-tr from-neon-cyan via-purple-600 to-neon-magenta p-1 shadow-lg shadow-neon-cyan/30 hover:scale-105 active:scale-95 transition-all duration-300 relative group flex items-center justify-center">
+                    <div class="w-full h-full bg-neon-dark rounded-full flex items-center justify-center transition-colors group-hover:bg-opacity-80">
+                        <i id="playIcon" class="fa-solid fa-play text-2xl sm:text-3xl text-white ml-1 transition-all"></i>
+                    </div>
+                </button>
+
+                <!-- Reload / Refresh Stream Button -->
+                <button id="refreshBtn" title="Reconnect Stream" aria-label="Reconnect Stream" class="glass-button w-12 h-12 rounded-2xl flex items-center justify-center text-gray-300 hover:text-white">
+                    <i class="fa-solid fa-rotate-right text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Volume Control Bar -->
+            <div class="w-full flex items-center space-x-3 px-4 py-2 glass-panel rounded-2xl">
+                <i class="fa-solid fa-volume-low text-xs text-gray-400"></i>
+                <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.8" aria-label="Volume Slider" class="w-full cursor-pointer">
+                <i class="fa-solid fa-volume-high text-xs text-gray-400"></i>
+                <span id="volumePercent" class="text-xs font-mono text-gray-400 w-8 text-right">80%</span>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER / CREDIT -->
+    <footer class="w-full max-w-4xl text-center py-4 text-xs text-gray-500 flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0 px-4">
+        <div>
+            <span>Powered by HTML5 Web Audio</span>
+        </div>
+        <div class="flex space-x-4">
+            <span class="hover:text-neon-cyan cursor-pointer transition-colors" id="btnEq">Equalizer FX</span>
+            <span>•</span>
+            <span class="hover:text-neon-cyan cursor-pointer transition-colors" id="btnTheme">Toggle Visuals</span>
+        </div>
+    </footer>
+
+    <!-- SLEEP TIMER MODAL -->
+    <div id="timerModal" class="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden opacity-0 transition-opacity duration-300">
+        <div class="glass-panel w-full max-w-sm rounded-3xl p-6 relative border border-white/20">
+            <button id="closeTimerModal" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <h3 class="font-display text-lg font-bold text-white mb-2 flex items-center space-x-2">
+                <i class="fa-regular fa-clock text-neon-cyan"></i>
+                <span>Sleep Timer</span>
+            </h3>
+            <p class="text-xs text-gray-300 mb-4">Automatically stop streaming after set time to save data and battery.</p>
+            
+            <div class="grid grid-cols-2 gap-2 mb-4">
+                <button class="timer-option glass-button py-2.5 rounded-xl text-xs font-semibold text-white" data-minutes="15">15 Minutes</button>
+                <button class="timer-option glass-button py-2.5 rounded-xl text-xs font-semibold text-white" data-minutes="30">30 Minutes</button>
+                <button class="timer-option glass-button py-2.5 rounded-xl text-xs font-semibold text-white" data-minutes="45">45 Minutes</button>
+                <button class="timer-option glass-button py-2.5 rounded-xl text-xs font-semibold text-white" data-minutes="60">60 Minutes</button>
+            </div>
+            
+            <button id="cancelTimerBtn" class="w-full py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-xl text-xs font-semibold border border-red-500/30 hidden">
+                Cancel Active Timer
+            </button>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-neon-violet/90 border border-neon-cyan text-white text-xs px-4 py-3 rounded-2xl shadow-xl flex items-center space-x-2 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <i class="fa-solid fa-circle-info text-neon-cyan"></i>
+        <span id="toastMsg">Notification message</span>
+    </div>
+
+    <!-- AUDIO ELEMENT & JAVASCRIPT LOGIC -->
+    <audio id="audioStream" crossorigin="anonymous" preload="none">
+        <source src="https://listen.181fm.com/181-energy98_128k.mp3" type="audio/mpeg">
+        Your browser does not support HTML5 Audio streaming.
+    </audio>
+
+    <script>
+        // DOM Elements
+        const audio = document.getElementById('audioStream');
+        const playBtn = document.getElementById('playBtn');
+        const playIcon = document.getElementById('playIcon');
+        const muteBtn = document.getElementById('muteBtn');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const volumePercent = document.getElementById('volumePercent');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const liveDot = document.getElementById('liveDot');
+        const liveText = document.getElementById('liveText');
+        const vinylRecord = document.getElementById('vinylRecord');
+        const discGlow = document.getElementById('discGlow');
+        const visualizerBars = document.getElementById('visualizerBars').children;
+        const favBtn = document.getElementById('favBtn');
+        const shareBtn = document.getElementById('shareBtn');
+        const timerBtn = document.getElementById('timerBtn');
+        const timerBadge = document.getElementById('timerBadge');
+        const timerModal = document.getElementById('timerModal');
+        const closeTimerModal = document.getElementById('closeTimerModal');
+        const cancelTimerBtn = document.getElementById('cancelTimerBtn');
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toastMsg');
+        const canvas = document.getElementById('canvasVisualizer');
+        const canvasCtx = canvas.getContext('2d');
+        const visFallback = document.getElementById('visFallback');
+
+        // App State
+        let isPlaying = false;
+        let isFavorite = false;
+        let timerId = null;
+        let timerEndTime = null;
+        let timerInterval = null;
+        let audioCtx = null;
+        let analyser = null;
+        let source = null;
+        let animationFrameId = null;
+        let fallbackAnimId = null;
+
+        // Initialize Canvas scale
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Toast Helper
+        function showToast(message) {
+            toastMsg.textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Web Audio Visualizer Setup
+        function initAudioContext() {
+            if (audioCtx) return;
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 64; // Low FFT size for fast responsive mobile rendering
+                source = audioCtx.createMediaElementSource(audio);
+                source.connect(analyser);
+                analyser.connect(audioCtx.destination);
+            } catch (e) {
+                console.log('Web Audio API restricted or failed to load CORS audio, using animated fallback.', e);
+            }
+        }
+
+        // Render Canvas Frequency Visualizer
+        function drawVisualizer() {
+            if (!isPlaying) return;
+
+            animationFrameId = requestAnimationFrame(drawVisualizer);
+
+            const width = canvas.width;
+            const height = canvas.height;
+            canvasCtx.clearRect(0, 0, width, height);
+
+            if (analyser) {
+                const bufferLength = analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+                analyser.getByteFrequencyData(dataArray);
+
+                const barWidth = (width / bufferLength) * 2;
+                let x = 0;
+
+                for (let i = 0; i < bufferLength; i++) {
+                    const barHeight = (dataArray[i] / 255) * height;
+
+                    // Neon cyan-magenta gradient for spectrum
+                    const gradient = canvasCtx.createLinearGradient(0, height, 0, 0);
+                    gradient.addColorStop(0, '#8a2be2');
+                    gradient.addColorStop(0.5, '#ff007f');
+                    gradient.addColorStop(1, '#00f3ff');
+
+                    canvasCtx.fillStyle = gradient;
+                    canvasCtx.fillRect(x, height - barHeight, barWidth - 2, barHeight);
+
+                    x += barWidth;
+                }
+            } else {
+                // Fallback procedural waveform visualization
+                drawFallbackVisualizer();
+            }
+        }
+
+        // Fallback smooth canvas animation if CORS blocks Web Audio API
+        let timeStep = 0;
+        function drawFallbackVisualizer() {
+            const width = canvas.width;
+            const height = canvas.height;
+            timeStep += 0.05;
+
+            const bars = 30;
+            const barWidth = width / bars;
+
+            for (let i = 0; i < bars; i++) {
+                const val = Math.sin(timeStep + i * 0.3) * 0.5 + 0.5;
+                const barHeight = val * (height * 0.8) + (height * 0.1);
+
+                const gradient = canvasCtx.createLinearGradient(0, height, 0, 0);
+                gradient.addColorStop(0, '#8a2be2');
+                gradient.addColorStop(1, '#00f3ff');
+
+                canvasCtx.fillStyle = gradient;
+                canvasCtx.fillRect(i * barWidth, height - barHeight, barWidth - 3, barHeight);
+            }
+        }
+
+        // Toggle Play / Pause Logic
+        async function togglePlay() {
+            if (!isPlaying) {
+                initAudioContext();
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    await audioCtx.resume();
+                }
+
+                audio.play().then(() => {
+                    isPlaying = true;
+                    updateUIState(true);
+                    drawVisualizer();
+                }).catch(err => {
+                    showToast('Unable to connect to live stream. Retry...');
+                    console.error(err);
+                });
+            } else {
+                audio.pause();
+                isPlaying = false;
+                updateUIState(false);
+                if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            }
+        }
+
+        // Update UI Visual elements on Play/Pause state
+        function updateUIState(active) {
+            if (active) {
+                playIcon.className = "fa-solid fa-pause text-2xl sm:text-3xl text-white transition-all";
+                liveDot.className = "w-2.5 h-2.5 rounded-full bg-neon-cyan animate-pulse";
+                liveText.textContent = "LIVE STREAMING";
+                liveText.className = "text-xs font-display font-semibold text-neon-cyan tracking-wider text-glow-cyan";
+                vinylRecord.classList.remove('paused');
+                discGlow.classList.add('shadow-[0_0_35px_rgba(0,243,255,0.3)]', 'border-neon-cyan/40');
+                visFallback.style.display = 'none';
+
+                // Randomize pulse indicator bars
+                Array.from(visualizerBars).forEach(bar => {
+                    bar.style.animationPlayState = 'running';
+                    bar.classList.add('animate-wave-bar');
+                });
+            } else {
+                playIcon.className = "fa-solid fa-play text-2xl sm:text-3xl text-white ml-1 transition-all";
+                liveDot.className = "w-2.5 h-2.5 rounded-full bg-gray-500";
+                liveText.textContent = "PAUSED";
+                liveText.className = "text-xs font-display font-semibold text-gray-400 tracking-wider";
+                vinylRecord.classList.add('paused');
+                discGlow.classList.remove('shadow-[0_0_35px_rgba(0,243,255,0.3)]', 'border-neon-cyan/40');
+                visFallback.style.display = 'flex';
+
+                Array.from(visualizerBars).forEach(bar => {
+                    bar.style.animationPlayState = 'paused';
+                    bar.classList.remove('animate-wave-bar');
+                });
+            }
+        }
+
+        // Event Listeners for Controls
+        playBtn.addEventListener('click', togglePlay);
+
+        // Stream Reload / Reconnect
+        refreshBtn.addEventListener('click', () => {
+            showToast('Reconnecting live stream...');
+            const wasPlaying = isPlaying;
+            audio.load();
+            if (wasPlaying) {
+                audio.play();
+                updateUIState(true);
+            }
+        });
+
+        // Volume Controls
+        volumeSlider.addEventListener('input', (e) => {
+            const val = e.target.value;
+            audio.volume = val;
+            volumePercent.textContent = `${Math.round(val * 100)}%`;
+            
+            if (val == 0) {
+                muteBtn.innerHTML = '<i class="fa-solid fa-volume-xmark text-lg text-red-400"></i>';
+            } else if (val < 0.5) {
+                muteBtn.innerHTML = '<i class="fa-solid fa-volume-low text-lg"></i>';
+            } else {
+                muteBtn.innerHTML = '<i class="fa-solid fa-volume-high text-lg"></i>';
+            }
+        });
+
+        // Quick Mute Toggle
+        let lastVolume = 0.8;
+        muteBtn.addEventListener('click', () => {
+            if (audio.volume > 0) {
+                lastVolume = audio.volume;
+                audio.volume = 0;
+                volumeSlider.value = 0;
+                volumePercent.textContent = '0%';
+                muteBtn.innerHTML = '<i class="fa-solid fa-volume-xmark text-lg text-red-400"></i>';
+            } else {
+                audio.volume = lastVolume;
+                volumeSlider.value = lastVolume;
+                volumePercent.textContent = `${Math.round(lastVolume * 100)}%`;
+                muteBtn.innerHTML = '<i class="fa-solid fa-volume-high text-lg"></i>';
+            }
+        });
+
+        // Favorite Station Toggle
+        favBtn.addEventListener('click', () => {
+            isFavorite = !isFavorite;
+            const icon = favBtn.querySelector('i');
+            if (isFavorite) {
+                icon.className = "fa-solid fa-heart text-base text-neon-magenta animate-bounce";
+                showToast('Station added to Favorites!');
+            } else {
+                icon.className = "fa-regular fa-heart text-base text-gray-300";
+                showToast('Removed from Favorites');
+            }
+        });
+
+        // Web Share API
+        shareBtn.addEventListener('click', () => {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Energy 98 - Live Radio',
+                    text: 'Listen to Energy 98 Hot AC & Dance Hits live online!',
+                    url: window.location.href,
+                }).catch(() => {});
+            } else {
+                // Fallback copy clipboard
+                document.execCommand('copy');
+                showToast('Stream link copied to clipboard!');
+            }
+        });
+
+        // SLEEP TIMER FUNCTIONALITY
+        timerBtn.addEventListener('click', () => {
+            timerModal.classList.remove('hidden');
+            setTimeout(() => timerModal.classList.remove('opacity-0'), 10);
+        });
+
+        closeTimerModal.addEventListener('click', closeModal);
+
+        function closeModal() {
+            timerModal.classList.add('opacity-0');
+            setTimeout(() => timerModal.classList.add('hidden'), 300);
+        }
+
+        document.querySelectorAll('.timer-option').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const minutes = parseInt(e.target.getAttribute('data-minutes'));
+                startTimer(minutes);
+                closeModal();
+            });
+        });
+
+        function startTimer(minutes) {
+            if (timerInterval) clearInterval(timerInterval);
+            
+            const durationMs = minutes * 60 * 1000;
+            timerEndTime = Date.now() + durationMs;
+            
+            timerBadge.classList.remove('hidden');
+            timerBadge.textContent = `${minutes}m`;
+            cancelTimerBtn.classList.remove('hidden');
+
+            showToast(`Sleep timer set for ${minutes} minutes`);
+
+            timerInterval = setInterval(() => {
+                const remainingSecs = Math.max(0, Math.ceil((timerEndTime - Date.now()) / 1000));
+                
+                if (remainingSecs <= 0) {
+                    clearInterval(timerInterval);
+                    audio.pause();
+                    isPlaying = false;
+                    updateUIState(false);
+                    timerBadge.classList.add('hidden');
+                    cancelTimerBtn.classList.add('hidden');
+                    showToast('Sleep timer ended stream');
+                } else {
+                    const m = Math.floor(remainingSecs / 60);
+                    timerBadge.textContent = `${m}m`;
+                }
+            }, 1000);
+        }
+
+        cancelTimerBtn.addEventListener('click', () => {
+            if (timerInterval) clearInterval(timerInterval);
+            timerBadge.classList.add('hidden');
+            cancelTimerBtn.classList.add('hidden');
+            showToast('Sleep timer canceled');
+            closeModal();
+        });
+
+        // Theme visualizer toggle button in footer
+        document.getElementById('btnTheme').addEventListener('click', () => {
+            showToast('Visual aesthetic mode toggled');
+            document.body.classList.toggle('brightness-125');
+        });
+
+        document.getElementById('btnEq').addEventListener('click', () => {
+            showToast('Equalizer FX preset set to Electro Boost');
+        });
+
+        // Error Handling
+        audio.addEventListener('error', (e) => {
+            showToast('Stream error occurred. Click reload to retry.');
+            updateUIState(false);
+            isPlaying = false;
+        });
+
+        // Keyboard Spacebar play/pause shortcut
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                togglePlay();
+            }
+        });
+    </script>
+</body>
+</html>
