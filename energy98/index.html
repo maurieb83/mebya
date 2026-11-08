@@ -3,7 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Energy 98 - Live Web Player</title>
+    <title>Energy 98 - Live Cyber Radio PWA</title>
+
+    <!-- PWA Primary Meta Tags -->
+    <meta name="theme-color" content="#0a0518">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Energy 98">
+    <meta name="description" content="Listen to Energy 98 Dance & Electronic radio live in high quality. Installable PWA.">
+
+    <!-- App Icons -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230a0518'/><circle cx='50' cy='50' r='35' fill='%238a2be2'/><path d='M40 30 L70 50 L40 70 Z' fill='%2300f3ff'/></svg>">
+    <link rel="apple-touch-icon" href="https://placehold.co/192x192/0a0518/00f3ff?text=E98">
+
+    <!-- Web App Manifest (Data URI Embedded for Instant PWA Support) -->
+    <link rel="manifest" id="manifestPlaceholder">
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome for Icons -->
@@ -52,7 +68,6 @@
     </script>
 
     <style>
-        /* Custom scrollbar and glassmorphism fine-tuning */
         body {
             background-color: #0a0518;
             background-image: 
@@ -87,11 +102,6 @@
             transform: translateY(-2px);
         }
 
-        .glass-button:active {
-            transform: translateY(0);
-        }
-
-        /* Custom range slider style */
         input[type=range] {
             -webkit-appearance: none;
             background: rgba(255, 255, 255, 0.1);
@@ -110,21 +120,10 @@
             transition: all 0.15s ease;
         }
 
-        input[type=range]::-webkit-slider-thumb:hover {
-            scale: 1.2;
-            background: #ffffff;
-            box-shadow: 0 0 15px #00f3ff, 0 0 25px #ff007f;
-        }
-
         .text-glow-cyan {
             text-shadow: 0 0 10px rgba(0, 243, 255, 0.6);
         }
 
-        .text-glow-magenta {
-            text-shadow: 0 0 10px rgba(255, 0, 127, 0.6);
-        }
-
-        /* Vinyl rotation */
         .spinning {
             animation: spin 10s linear infinite;
         }
@@ -141,6 +140,25 @@
 
 <body class="min-h-full flex flex-col justify-between items-center p-3 sm:p-6 select-none overflow-x-hidden">
 
+    <!-- PWA INSTALL BANNER (Floating top alert) -->
+    <div id="pwaBanner" class="w-full max-w-4xl glass-panel rounded-2xl p-3 mb-4 hidden flex-col sm:flex-row items-center justify-between border border-neon-cyan/50 shadow-lg shadow-neon-cyan/10">
+        <div class="flex items-center space-x-3 mb-2 sm:mb-0">
+            <div class="w-10 h-10 rounded-xl bg-neon-cyan/20 flex items-center justify-center text-neon-cyan">
+                <i class="fa-solid fa-mobile-screen-button text-lg"></i>
+            </div>
+            <div>
+                <h4 class="font-display font-semibold text-sm text-white">¡Instalá Energy 98 en tu celu!</h4>
+                <p class="text-xs text-gray-300">Escuchá la radio sin abrir el navegador.</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+            <button id="pwaCloseBtn" class="px-3 py-1.5 text-xs text-gray-400 hover:text-white">Ahora no</button>
+            <button id="pwaInstallBtn" class="px-4 py-2 bg-gradient-to-r from-neon-cyan to-neon-magenta text-black font-display font-bold text-xs rounded-xl hover:scale-105 transition-transform shadow-md">
+                <i class="fa-solid fa-download mr-1"></i> INSTALAR APP
+            </button>
+        </div>
+    </div>
+
     <!-- TOP NAV / HEADER -->
     <header class="w-full max-w-4xl flex justify-between items-center py-3 px-4 glass-panel rounded-2xl mb-4 sm:mb-6">
         <div class="flex items-center space-x-3">
@@ -155,8 +173,13 @@
             </div>
         </div>
 
-        <!-- Header Quick Action Controls -->
+        <!-- Header Controls -->
         <div class="flex items-center space-x-2">
+            <!-- Manual Install PWA Header Icon (visible if installable) -->
+            <button id="pwaNavInstallBtn" title="Instalar App" aria-label="Instalar App" class="glass-button w-10 h-10 rounded-xl flex items-center justify-center text-neon-cyan hidden border-neon-cyan/40">
+                <i class="fa-solid fa-download text-base"></i>
+            </button>
+
             <!-- Favorite Toggle Button -->
             <button id="favBtn" aria-label="Favorite Station" class="glass-button w-10 h-10 rounded-xl flex items-center justify-center text-gray-300 hover:text-neon-magenta">
                 <i class="fa-regular fa-heart text-base transition-transform active:scale-125"></i>
@@ -177,19 +200,16 @@
 
     <!-- MAIN PLAYER CARD -->
     <main class="w-full max-w-4xl glass-panel rounded-3xl p-4 sm:p-8 flex flex-col items-center shadow-2xl relative overflow-hidden my-auto">
-        <!-- Ambient Neon Glow Backdrop inside container -->
         <div class="absolute -top-24 -left-24 w-64 h-64 bg-neon-cyan/20 rounded-full blur-3xl pointer-events-none"></div>
         <div class="absolute -bottom-24 -right-24 w-64 h-64 bg-neon-magenta/20 rounded-full blur-3xl pointer-events-none"></div>
 
-        <!-- Live Status Bar & Peak Meter -->
+        <!-- Live Status Bar -->
         <div class="w-full flex justify-between items-center mb-6 px-2">
-            <!-- Live Indicator Badge -->
             <div class="flex items-center space-x-2 bg-black/40 px-3 py-1.5 rounded-full border border-white/10">
                 <span id="liveDot" class="w-2.5 h-2.5 rounded-full bg-gray-500"></span>
                 <span id="liveText" class="text-xs font-display font-semibold text-gray-400 tracking-wider">OFFLINE</span>
             </div>
 
-            <!-- Equalizer / Visualizer Bar indicators -->
             <div id="visualizerBars" class="flex items-end space-x-1 h-6 px-2 opacity-40">
                 <div class="w-1 bg-neon-cyan rounded-t h-2 transition-all duration-300"></div>
                 <div class="w-1 bg-neon-cyan rounded-t h-4 transition-all duration-300"></div>
@@ -201,17 +221,12 @@
 
         <!-- ALBUM ART / VINYL DISK DISPLAY -->
         <div class="relative my-4 sm:my-6 flex justify-center items-center">
-            <!-- Vinyl Outer Ring Accent -->
             <div id="discGlow" class="w-56 h-56 sm:w-72 sm:h-72 rounded-full border border-white/10 flex items-center justify-center p-3 relative transition-all duration-700">
-                
-                <!-- Rotating Record / Artwork -->
                 <div id="vinylRecord" class="w-full h-full rounded-full bg-gradient-to-br from-gray-900 via-black to-gray-950 p-2 shadow-2xl relative flex items-center justify-center spinning paused border border-white/10">
-                    <!-- Vinyl Grooves Visual -->
                     <div class="absolute inset-2 rounded-full border border-white/5 pointer-events-none"></div>
                     <div class="absolute inset-6 rounded-full border border-white/5 pointer-events-none"></div>
                     <div class="absolute inset-10 rounded-full border border-white/5 pointer-events-none"></div>
                     
-                    <!-- Center Cover Image -->
                     <div class="w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden border-4 border-neon-dark shadow-inner relative z-10 flex items-center justify-center bg-neon-violet">
                         <img id="albumArt" 
                              src="https://images.unsplash.com/photo-1571266028243-3716f02d2d2e?auto=format&fit=crop&w=400&q=80" 
@@ -219,7 +234,6 @@
                              class="w-full h-full object-cover"
                              onerror="this.src='https://placehold.co/400x400/1a0b2e/00f3ff?text=Energy+98'">
                     </div>
-                    <!-- Spindle Hole -->
                     <div class="w-4 h-4 rounded-full bg-neon-dark absolute z-20 border border-white/20"></div>
                 </div>
             </div>
@@ -248,10 +262,7 @@
 
         <!-- PLAYER CONTROLS SECTION -->
         <div class="w-full max-w-lg mt-4 flex flex-col items-center space-y-6">
-            
-            <!-- Main Play / Pause Button Center -->
             <div class="flex items-center justify-center space-x-6 w-full">
-                <!-- Mute Toggle (Mobile Friendly) -->
                 <button id="muteBtn" aria-label="Mute Stream" class="glass-button w-12 h-12 rounded-2xl flex items-center justify-center text-gray-300 hover:text-white">
                     <i class="fa-solid fa-volume-high text-lg"></i>
                 </button>
@@ -263,7 +274,6 @@
                     </div>
                 </button>
 
-                <!-- Reload / Refresh Stream Button -->
                 <button id="refreshBtn" title="Reconnect Stream" aria-label="Reconnect Stream" class="glass-button w-12 h-12 rounded-2xl flex items-center justify-center text-gray-300 hover:text-white">
                     <i class="fa-solid fa-rotate-right text-lg"></i>
                 </button>
@@ -282,7 +292,7 @@
     <!-- FOOTER / CREDIT -->
     <footer class="w-full max-w-4xl text-center py-4 text-xs text-gray-500 flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0 px-4">
         <div>
-            <span>Powered by HTML5 Web Audio</span>
+            <span>Energy 98 PWA App • 181.FM</span>
         </div>
         <div class="flex space-x-4">
             <span class="hover:text-neon-cyan cursor-pointer transition-colors" id="btnEq">Equalizer FX</span>
@@ -301,35 +311,146 @@
                 <i class="fa-regular fa-clock text-neon-cyan"></i>
                 <span>Sleep Timer</span>
             </h3>
-            <p class="text-xs text-gray-300 mb-4">Automatically stop streaming after set time to save data and battery.</p>
+            <p class="text-xs text-gray-300 mb-4">Apagado automático de reproducción.</p>
             
             <div class="grid grid-cols-2 gap-2 mb-4">
-                <button class="timer-option glass-button py-2.5 rounded-xl text-xs font-semibold text-white" data-minutes="15">15 Minutes</button>
-                <button class="timer-option glass-button py-2.5 rounded-xl text-xs font-semibold text-white" data-minutes="30">30 Minutes</button>
-                <button class="timer-option glass-button py-2.5 rounded-xl text-xs font-semibold text-white" data-minutes="45">45 Minutes</button>
-                <button class="timer-option glass-button py-2.5 rounded-xl text-xs font-semibold text-white" data-minutes="60">60 Minutes</button>
+                <button class="timer-option glass-button py-2.5 rounded-xl text-xs font-semibold text-white" data-minutes="15">15 Minutos</button>
+                <button class="timer-option glass-button py-2.5 rounded-xl text-xs font-semibold text-white" data-minutes="30">30 Minutos</button>
+                <button class="timer-option glass-button py-2.5 rounded-xl text-xs font-semibold text-white" data-minutes="45">45 Minutos</button>
+                <button class="timer-option glass-button py-2.5 rounded-xl text-xs font-semibold text-white" data-minutes="60">60 Minutos</button>
             </div>
             
             <button id="cancelTimerBtn" class="w-full py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-xl text-xs font-semibold border border-red-500/30 hidden">
-                Cancel Active Timer
+                Cancelar Temporizador
             </button>
         </div>
     </div>
 
-    <!-- TOAST NOTIFICATION CONTAINER -->
+    <!-- TOAST NOTIFICATION -->
     <div id="toast" class="fixed bottom-6 right-6 bg-neon-violet/90 border border-neon-cyan text-white text-xs px-4 py-3 rounded-2xl shadow-xl flex items-center space-x-2 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
         <i class="fa-solid fa-circle-info text-neon-cyan"></i>
         <span id="toastMsg">Notification message</span>
     </div>
 
-    <!-- AUDIO ELEMENT & JAVASCRIPT LOGIC -->
+    <!-- AUDIO STREAM -->
     <audio id="audioStream" crossorigin="anonymous" preload="none">
         <source src="https://listen.181fm.com/181-energy98_128k.mp3" type="audio/mpeg">
-        Your browser does not support HTML5 Audio streaming.
     </audio>
 
+    <!-- INLINE PWA MANIFEST & SERVICE WORKER LOGIC -->
     <script>
-        // DOM Elements
+        // 1. DYNAMIC MANIFEST DATA URI GENERATION
+        const pwaManifest = {
+            "name": "Energy 98 Cyber Radio",
+            "short_name": "Energy 98",
+            "start_url": "./",
+            "display": "standalone",
+            "background_color": "#0a0518",
+            "theme_color": "#0a0518",
+            "orientation": "portrait",
+            "description": "Listen live to Energy 98 Dance Radio",
+            "icons": [
+                {
+                    "src": "https://placehold.co/192x192/0a0518/00f3ff?text=Energy98",
+                    "sizes": "192x192",
+                    "type": "image/png",
+                    "purpose": "any maskable"
+                },
+                {
+                    "src": "https://placehold.co/512x512/0a0518/ff007f?text=Energy98",
+                    "sizes": "512x512",
+                    "type": "image/png",
+                    "purpose": "any maskable"
+                }
+            ]
+        };
+
+        const manifestBlob = new Blob([JSON.stringify(pwaManifest)], { type: 'application/json' });
+        document.getElementById('manifestPlaceholder').setAttribute('href', URL.createObjectURL(manifestBlob));
+
+        // 2. SERVICE WORKER INLINE REGISTRATION
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // Inline worker code as Blob for instant zero-config PWA deployment
+                const swCode = `
+                    const CACHE_NAME = 'energy98-pwa-v1';
+                    const ASSETS = ['./'];
+
+                    self.addEventListener('install', (e) => {
+                        e.waitUntil(
+                            caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+                        );
+                        self.skipWaiting();
+                    });
+
+                    self.addEventListener('activate', (e) => {
+                        e.waitUntil(caches.keys().then((keys) => {
+                            return Promise.all(keys.map((k) => {
+                                if (k !== CACHE_NAME) return caches.delete(k);
+                            }));
+                        }));
+                        self.clients.claim();
+                    });
+
+                    self.addEventListener('fetch', (e) => {
+                        // Pass live audio stream direct to network without caching
+                        if (e.request.url.includes('181fm.com')) {
+                            return;
+                        }
+                        e.respondWith(
+                            caches.match(e.request).then((res) => res || fetch(e.request))
+                        );
+                    });
+                `;
+                const blob = new Blob([swCode], { type: 'text/javascript' });
+                navigator.serviceWorker.register(URL.createObjectURL(blob))
+                    .then(reg => console.log('PWA Service Worker registered:', reg.scope))
+                    .catch(err => console.log('SW registration error:', err));
+            });
+        }
+
+        // 3. PWA INSTALL PROMPT LOGIC
+        let deferredPrompt = null;
+        const pwaBanner = document.getElementById('pwaBanner');
+        const pwaInstallBtn = document.getElementById('pwaInstallBtn');
+        const pwaNavInstallBtn = document.getElementById('pwaNavInstallBtn');
+        const pwaCloseBtn = document.getElementById('pwaCloseBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            pwaBanner.classList.remove('hidden');
+            pwaBanner.classList.add('flex');
+            pwaNavInstallBtn.classList.remove('hidden');
+        });
+
+        async function triggerPwaInstall() {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                showToast('¡Gracias por instalar Energy 98!');
+            }
+            deferredPrompt = null;
+            pwaBanner.classList.add('hidden');
+            pwaNavInstallBtn.classList.add('hidden');
+        }
+
+        pwaInstallBtn.addEventListener('click', triggerPwaInstall);
+        pwaNavInstallBtn.addEventListener('click', triggerPwaInstall);
+        pwaCloseBtn.addEventListener('click', () => {
+            pwaBanner.classList.add('hidden');
+        });
+
+        window.addEventListener('appinstalled', () => {
+            pwaBanner.classList.add('hidden');
+            pwaNavInstallBtn.classList.add('hidden');
+            showToast('Energy 98 ya está instalada en tu dispositivo');
+        });
+    </script>
+
+    <!-- CORE PLAYER INTERACTION LOGIC -->
+    <script>
         const audio = document.getElementById('audioStream');
         const playBtn = document.getElementById('playBtn');
         const playIcon = document.getElementById('playIcon');
@@ -355,19 +476,15 @@
         const canvasCtx = canvas.getContext('2d');
         const visFallback = document.getElementById('visFallback');
 
-        // App State
         let isPlaying = false;
         let isFavorite = false;
-        let timerId = null;
         let timerEndTime = null;
         let timerInterval = null;
         let audioCtx = null;
         let analyser = null;
         let source = null;
         let animationFrameId = null;
-        let fallbackAnimId = null;
 
-        // Initialize Canvas scale
         function resizeCanvas() {
             canvas.width = canvas.parentElement.clientWidth;
             canvas.height = canvas.parentElement.clientHeight;
@@ -375,7 +492,6 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // Toast Helper
         function showToast(message) {
             toastMsg.textContent = message;
             toast.classList.remove('translate-y-20', 'opacity-0');
@@ -384,26 +500,23 @@
             }, 3000);
         }
 
-        // Web Audio Visualizer Setup
         function initAudioContext() {
             if (audioCtx) return;
             try {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 audioCtx = new AudioContext();
                 analyser = audioCtx.createAnalyser();
-                analyser.fftSize = 64; // Low FFT size for fast responsive mobile rendering
+                analyser.fftSize = 64;
                 source = audioCtx.createMediaElementSource(audio);
                 source.connect(analyser);
                 analyser.connect(audioCtx.destination);
             } catch (e) {
-                console.log('Web Audio API restricted or failed to load CORS audio, using animated fallback.', e);
+                console.log('Audio Context restriction mode enabled', e);
             }
         }
 
-        // Render Canvas Frequency Visualizer
         function drawVisualizer() {
             if (!isPlaying) return;
-
             animationFrameId = requestAnimationFrame(drawVisualizer);
 
             const width = canvas.width;
@@ -420,8 +533,6 @@
 
                 for (let i = 0; i < bufferLength; i++) {
                     const barHeight = (dataArray[i] / 255) * height;
-
-                    // Neon cyan-magenta gradient for spectrum
                     const gradient = canvasCtx.createLinearGradient(0, height, 0, 0);
                     gradient.addColorStop(0, '#8a2be2');
                     gradient.addColorStop(0.5, '#ff007f');
@@ -429,16 +540,13 @@
 
                     canvasCtx.fillStyle = gradient;
                     canvasCtx.fillRect(x, height - barHeight, barWidth - 2, barHeight);
-
                     x += barWidth;
                 }
             } else {
-                // Fallback procedural waveform visualization
                 drawFallbackVisualizer();
             }
         }
 
-        // Fallback smooth canvas animation if CORS blocks Web Audio API
         let timeStep = 0;
         function drawFallbackVisualizer() {
             const width = canvas.width;
@@ -451,7 +559,6 @@
             for (let i = 0; i < bars; i++) {
                 const val = Math.sin(timeStep + i * 0.3) * 0.5 + 0.5;
                 const barHeight = val * (height * 0.8) + (height * 0.1);
-
                 const gradient = canvasCtx.createLinearGradient(0, height, 0, 0);
                 gradient.addColorStop(0, '#8a2be2');
                 gradient.addColorStop(1, '#00f3ff');
@@ -461,7 +568,6 @@
             }
         }
 
-        // Toggle Play / Pause Logic
         async function togglePlay() {
             if (!isPlaying) {
                 initAudioContext();
@@ -474,7 +580,7 @@
                     updateUIState(true);
                     drawVisualizer();
                 }).catch(err => {
-                    showToast('Unable to connect to live stream. Retry...');
+                    showToast('Reintentando conexión con la radio...');
                     console.error(err);
                 });
             } else {
@@ -485,18 +591,16 @@
             }
         }
 
-        // Update UI Visual elements on Play/Pause state
         function updateUIState(active) {
             if (active) {
                 playIcon.className = "fa-solid fa-pause text-2xl sm:text-3xl text-white transition-all";
                 liveDot.className = "w-2.5 h-2.5 rounded-full bg-neon-cyan animate-pulse";
-                liveText.textContent = "LIVE STREAMING";
+                liveText.textContent = "EN VIVO";
                 liveText.className = "text-xs font-display font-semibold text-neon-cyan tracking-wider text-glow-cyan";
                 vinylRecord.classList.remove('paused');
                 discGlow.classList.add('shadow-[0_0_35px_rgba(0,243,255,0.3)]', 'border-neon-cyan/40');
                 visFallback.style.display = 'none';
 
-                // Randomize pulse indicator bars
                 Array.from(visualizerBars).forEach(bar => {
                     bar.style.animationPlayState = 'running';
                     bar.classList.add('animate-wave-bar');
@@ -504,7 +608,7 @@
             } else {
                 playIcon.className = "fa-solid fa-play text-2xl sm:text-3xl text-white ml-1 transition-all";
                 liveDot.className = "w-2.5 h-2.5 rounded-full bg-gray-500";
-                liveText.textContent = "PAUSED";
+                liveText.textContent = "PAUSADO";
                 liveText.className = "text-xs font-display font-semibold text-gray-400 tracking-wider";
                 vinylRecord.classList.add('paused');
                 discGlow.classList.remove('shadow-[0_0_35px_rgba(0,243,255,0.3)]', 'border-neon-cyan/40');
@@ -517,12 +621,10 @@
             }
         }
 
-        // Event Listeners for Controls
         playBtn.addEventListener('click', togglePlay);
 
-        // Stream Reload / Reconnect
         refreshBtn.addEventListener('click', () => {
-            showToast('Reconnecting live stream...');
+            showToast('Reconectando señal en vivo...');
             const wasPlaying = isPlaying;
             audio.load();
             if (wasPlaying) {
@@ -531,7 +633,6 @@
             }
         });
 
-        // Volume Controls
         volumeSlider.addEventListener('input', (e) => {
             const val = e.target.value;
             audio.volume = val;
@@ -546,7 +647,6 @@
             }
         });
 
-        // Quick Mute Toggle
         let lastVolume = 0.8;
         muteBtn.addEventListener('click', () => {
             if (audio.volume > 0) {
@@ -563,42 +663,37 @@
             }
         });
 
-        // Favorite Station Toggle
         favBtn.addEventListener('click', () => {
             isFavorite = !isFavorite;
             const icon = favBtn.querySelector('i');
             if (isFavorite) {
                 icon.className = "fa-solid fa-heart text-base text-neon-magenta animate-bounce";
-                showToast('Station added to Favorites!');
+                showToast('¡Guardado en favoritos!');
             } else {
                 icon.className = "fa-regular fa-heart text-base text-gray-300";
-                showToast('Removed from Favorites');
+                showToast('Eliminado de favoritos');
             }
         });
 
-        // Web Share API
         shareBtn.addEventListener('click', () => {
             if (navigator.share) {
                 navigator.share({
-                    title: 'Energy 98 - Live Radio',
-                    text: 'Listen to Energy 98 Hot AC & Dance Hits live online!',
+                    title: 'Energy 98 Cyber Radio PWA',
+                    text: '¡Escuchá Energy 98 en vivo desde la web app!',
                     url: window.location.href,
                 }).catch(() => {});
             } else {
-                // Fallback copy clipboard
                 document.execCommand('copy');
-                showToast('Stream link copied to clipboard!');
+                showToast('Enlace copiado al portapapeles');
             }
         });
 
-        // SLEEP TIMER FUNCTIONALITY
         timerBtn.addEventListener('click', () => {
             timerModal.classList.remove('hidden');
             setTimeout(() => timerModal.classList.remove('opacity-0'), 10);
         });
 
         closeTimerModal.addEventListener('click', closeModal);
-
         function closeModal() {
             timerModal.classList.add('opacity-0');
             setTimeout(() => timerModal.classList.add('hidden'), 300);
@@ -622,7 +717,7 @@
             timerBadge.textContent = `${minutes}m`;
             cancelTimerBtn.classList.remove('hidden');
 
-            showToast(`Sleep timer set for ${minutes} minutes`);
+            showToast(`Temporizador programado a ${minutes} minutos`);
 
             timerInterval = setInterval(() => {
                 const remainingSecs = Math.max(0, Math.ceil((timerEndTime - Date.now()) / 1000));
@@ -634,7 +729,7 @@
                     updateUIState(false);
                     timerBadge.classList.add('hidden');
                     cancelTimerBtn.classList.add('hidden');
-                    showToast('Sleep timer ended stream');
+                    showToast('Radio apágada por temporizador');
                 } else {
                     const m = Math.floor(remainingSecs / 60);
                     timerBadge.textContent = `${m}m`;
@@ -646,28 +741,25 @@
             if (timerInterval) clearInterval(timerInterval);
             timerBadge.classList.add('hidden');
             cancelTimerBtn.classList.add('hidden');
-            showToast('Sleep timer canceled');
+            showToast('Temporizador cancelado');
             closeModal();
         });
 
-        // Theme visualizer toggle button in footer
         document.getElementById('btnTheme').addEventListener('click', () => {
-            showToast('Visual aesthetic mode toggled');
             document.body.classList.toggle('brightness-125');
+            showToast('Efecto visual modificado');
         });
 
         document.getElementById('btnEq').addEventListener('click', () => {
-            showToast('Equalizer FX preset set to Electro Boost');
+            showToast('Ecualizador: Modo Cyber Bass activado');
         });
 
-        // Error Handling
-        audio.addEventListener('error', (e) => {
-            showToast('Stream error occurred. Click reload to retry.');
+        audio.addEventListener('error', () => {
+            showToast('Error de señal. Presioná recargar para reintentar.');
             updateUIState(false);
             isPlaying = false;
         });
 
-        // Keyboard Spacebar play/pause shortcut
         window.addEventListener('keydown', (e) => {
             if (e.code === 'Space') {
                 e.preventDefault();
