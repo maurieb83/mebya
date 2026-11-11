@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Libros/audios para emprender</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: #222;
+      background-color: #f5f5f5;
+    }
+
+    header {
+      padding: 28px 16px;
+      text-align: center;
+      color: white;
+      background-color: #214e34;
+    }
+
+    h1 {
+      margin: 0;
+    }
+
+    main {
+      width: min(100% - 32px, 1100px);
+      margin: 32px auto;
+    }
+
+    .libros {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    .libro {
+      min-height: 160px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px #00000018;
+    }
+
+    .contactos {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 36px 0;
+    }
+
+    .contactos a {
+      padding: 12px 20px;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 8px;
+    }
+
+    .whatsapp { background-color: #25d366; }
+    .telegram { background-color: #229ed9; }
+    .gmail { background-color: #d93025; }
+
+    @media (max-width: 600px) {
+      .libros {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+
+      .libro {
+        min-height: 130px;
+        padding: 14px;
+      }
+    }
+    
+    .libro {
+  color: inherit;
+  text-decoration: none;
+}
+
+    .google-play {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 12px 20px;
+  color: #214e34;
+  background-color: white;
+  text-decoration: none;
+  font-weight: bold;
+  border-radius: 8px;
+}
+
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Libros/audios para emprender</h1>
+    <a class="google-play" href="https://play.google.com/store/apps/details?id=io.githubmebya.emprende" target="_blank" rel="noopener">
+  Disponible en Google Play
+</a>
+  </header>
+
+  <main>
+    <section class="libros" aria-label="Libros recomendados">
+      <a class="libro" href="Padre_Rico_Padre_Pobre-Robert_Kiyosaki2015.pdf" target="_blank" rel="noopener">
+  💰 Padre Rico Padre Pobre
+</a>
+
+<a class="libro" href="Los-secretos-de-la-mente-millonaria.pdf" target="_blank" rel="noopener">
+  🧠 Los secretos de la mente millonaria
+</a>
+
+<a class="libro" href="La-magia-de-pensar-en-grande.pdf" target="_blank" rel="noopener">
+  🚀 La magia de pensar en grande
+</a>
+
+<a class="libro" href="Piense-y-Hagase-Rico.pdf" target="_blank" rel="noopener">
+  🏆 Piense y hágase rico
+</a>
+
+<a class="libro" href="creelo.pdf" target="_blank" rel="noopener">
+  ✨ Créelo
+</a>
+
+<a class="libro" href="El-negocio-del-siglo-XXI-Robert-T.-Kiyosaki.pdf" target="_blank" rel="noopener">
+  📈 El negocio del siglo XXI
+</a>
+
+<a class="libro" href="https://open.spotify.com/episode/2rIJnYJP1lFmHYq3k9BihV?si=MG-4RMFeRuidFoaynZ3g-Q&utm=&nd=1&dlsi=efa5089503974061" target="_blank" rel="noopener">
+  🔊 Un SI puede transformar tu vida
+</a>
+
+<a class="libro" href="https://open.spotify.com/episode/4IbzXF1wh2o2EeVroCBfvv?si=fwnFALEOS9i4R2eCBOWOUg&utm=&nd=1&dlsi=828c99fa8d36409a" target="_blank" rel="noopener">
+  🔊 El negocio más potente del mundo
+</a>
+
+    </section>
+
+    <nav class="contactos" aria-label="Formas de contacto">
+      <a class="whatsapp" href="https://wa.me/5493764294010" target="_blank" rel="noopener">
+        WhatsApp
+      </a>
+      <a class="telegram" href="https://t.me/mauriciobobadilla" target="_blank" rel="noopener">
+        Telegram
+      </a>
+    </nav>
+    <nav class="contactos" aria-label="Formas de contacto">
+      <a class="gmail" href="mailto:mauricioeb83@gmail.com">
+        Gmail
+      </a>
+    </nav>
+  </main>
+</body>
+</html>
